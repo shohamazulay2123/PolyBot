@@ -3,6 +3,7 @@ from utils import search_download_youtube_video
 from loguru import logger
 
 
+
 class Bot:
 
     def __init__(self, token):
@@ -42,8 +43,39 @@ class QuoteBot(Bot):
         self.send_text(update, f'Your original message: {update.message.text}', quote=to_quote)
 
 
+
+
+
+
 class YoutubeBot(Bot):
-    pass
+    def __init__(self, token, video_dir):
+        super().__init__(token)
+        self.video_dir = video_dir
+
+        # add message handler for text messages
+        self.updater.dispatcher.add_handler(MessageHandler(Filters.text, self._message_handler))
+
+        # dictionary to cache downloaded videos
+        self.cached_videos = {}
+
+    def _message_handler(self, update, context):
+        # get the search query from the user's message
+        query = update.message.text
+
+        # check if the video has already been downloaded
+        if query in self.cached_videos:
+            video_path = self.cached_videos[query]
+        else:
+            # search and download the video
+            video_path = search_download_youtube_video(query, self.video_dir)
+            self.cached_videos[query] = video_path
+
+        # send the video to the user
+        self.send_video(update, context, video_path)
+
+    def send_video(self, update, context, file_path):
+        """Sends video to a chat"""
+        context.bot.send_video(chat_id=update.message.chat_id, video=open(file_path, 'rb'), supports_streaming=True)
 
 
 if __name__ == '__main__':
@@ -52,4 +84,3 @@ if __name__ == '__main__':
 
     my_bot = Bot(_token)
     my_bot.start()
-

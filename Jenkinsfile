@@ -4,7 +4,16 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'echo building...'
+                withCredentials([usernamePassword(credentialsId: 'git-hub-ron', passwordVariable: 'pass', usernameVariable: 'user')]) {
+
+
+                sh '''
+                docker login --username $user --password $pass
+                docker build ...
+                docker tag ...
+                docker push ...
+           '''
+                }
             }
         }
         stage('Stage II') {

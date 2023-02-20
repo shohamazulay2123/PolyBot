@@ -1,15 +1,27 @@
-from youtube_dl import YoutubeDL
+from pytube import YouTube
+from pytube import Search
 
-
-def search_download_youtube_video(video_name, num_results=1):
+def search_youtube_videos(query, num_results=1):
     """
-    This function downloads the first num_results search results from Youtube
-    :param video_name: string of the video name
-    :param num_results: integer representing how many videos to download
-    :return: list of paths to your downloaded video files
+    This function searches Youtube for videos based on the given query and returns details about the first num_results videos
+    :param query: string of the query to search for
+    :param num_results: integer representing how many videos to return
+    :return: list of dictionaries containing details about the videos
     """
-    with YoutubeDL() as ydl:
-        videos = ydl.extract_info(f"ytsearch{num_results}:{video_name}", download=True)['entries']
+    search_results = Search(query).results[:num_results]
+    video_details = []
 
-    return [ydl.prepare_filename(video) for video in videos]
+    for search_result in search_results:
+        yt = YouTube(search_result.watch_url)
+        details = {
+            'title': yt.title,
+            'description': yt.description,
+            'duration': yt.length,
+            'url': yt.watch_url,
+            'thumbnail': yt.thumbnail_url,
+            'author': yt.author,
+            'views': yt.views
+        }
+        video_details.append(details)
 
+    return video_details

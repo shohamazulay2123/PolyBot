@@ -26,5 +26,12 @@ pipeline {
                 sh 'echo echo "stage III..."'
             }
         }
+        stage('Integration Test') {
+             steps {
+                 sh 'npm install'
+                 sh 'npm run test:integration'
+             }
+         }
+
     }
 }

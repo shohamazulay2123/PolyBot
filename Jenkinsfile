@@ -26,9 +26,9 @@ pipeline {
                 stage('pytest') {
                     steps {
                         withCredentials([file(credentialsId: 'telegramToken', variable: 'TELEGRAM_TOKEN')]) {
-                        sh "cp ${TELEGRAM_TOKEN} .telegramToken"
-                        sh 'pip3 install -r requirements.txt'
-                        sh "python3 -m pytest --junitxml results.xml tests/*.py"
+                        bat "cp ${TELEGRAM_TOKEN} .telegramToken"
+                        bat 'pip3 install -r requirements.txt'
+                        bat "python3 -m pytest --junitxml results.xml tests/*.py"
                         }
                     }
                 }
@@ -37,7 +37,7 @@ pipeline {
                         script { 
                             logs.info 'Starting'
                             logs.warning 'Nothing to do!'
-                            sh "python3 -m pylint *.py || true"
+                            bat "python3 -m pylint *.py || true"
                         }
                     }
                 }
@@ -47,19 +47,19 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'pass', usernameVariable: 'user')]) {
 
-                  sh "docker build -t ronhad/private-course:poly-bot-${env.BUILD_NUMBER} . "
-                  sh "docker login --username $user --password $pass"
+                  bat "docker build -t ronhad/private-course:poly-bot-${env.BUILD_NUMBER} . "
+                  bat "docker login --username $user --password $pass"
                 }
             }
         }
         stage('snyk test') {
             steps {
-                sh "snyk container test --severity-threshold=critical ronhad/private-course:poly-bot-${env.BUILD_NUMBER} --file=Dockerfile"
+                bat "snyk container test --severity-threshold=critical ronhad/private-course:poly-bot-${env.BUILD_NUMBER} --file=Dockerfile"
             }
         }
         stage('push') {
             steps {
-                    sh "docker push ronhad/private-course:poly-bot-${env.BUILD_NUMBER}"
+                    bat "docker push ronhad/private-course:poly-bot-${env.BUILD_NUMBER}"
             }
 
         }

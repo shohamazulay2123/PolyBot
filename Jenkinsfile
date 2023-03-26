@@ -23,8 +23,11 @@ pipeline {
                     sh "docker login --username $shohama --password $myaccesstoken"
                     sh "docker build -t polybot:${BUILD_NUMBER} ."
                     sh "docker tag polybot:${BUILD_NUMBER} shohama/polybot:${BUILD_NUMBER}"
-                }
+                 }
             }
+        }
+      
+        }
         
         
         stage('Push Bot App') {

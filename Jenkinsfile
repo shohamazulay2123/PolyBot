@@ -21,15 +21,15 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'DockerTokenID', passwordVariable: 'myaccesstoken', usernameVariable: 'shohama')]) {
                     sh "docker login --username $shohama --password $myaccesstoken"
-                    sh "docker build -t build_bot:${BUILD_NUMBER} ."
-                    sh "docker tag build_bot:${BUILD_NUMBER} shohama/build_bot:${BUILD_NUMBER}"
+                    sh "docker build -t polybot:${BUILD_NUMBER} ."
+                    sh "docker tag polybot:${BUILD_NUMBER} shohama/polybot:${BUILD_NUMBER}"
                 }
             }
         }
         stage('Snyk Test') {
             steps {
             withCredentials([string(credentialsId: 'SnykToken', variable: 'SNYK_TOKEN')]) {
-            sh "snyk container test --severity-threshold=critical build_bot:${BUILD_NUMBER} --file=Dockerfile --token=${SNYK_TOKEN} --exclude-base-image-vulns"
+            sh "snyk container test --severity-threshold=critical polybot:${BUILD_NUMBER} --file=Dockerfile --token=${SNYK_TOKEN} --exclude-base-image-vulns"
             }
         }
         }

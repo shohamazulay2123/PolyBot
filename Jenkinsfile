@@ -35,13 +35,13 @@ pipeline {
         }
         stage('Push Bot App') {
             steps {
-                    sh "docker push shohama/build_bot:${BUILD_NUMBER}"
+                    sh "docker push shohama/polybot:${BUILD_NUMBER}"
                 }
             }
     }
     post {
         always {
-            sh "docker rmi shohama/build_bot:${BUILD_NUMBER}"
+            sh "docker rmi shohama/polybot:${BUILD_NUMBER}"
         }
     }
 }

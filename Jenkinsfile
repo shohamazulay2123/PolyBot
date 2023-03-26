@@ -26,8 +26,7 @@ pipeline {
                 }
             }
         
-        }
-        }
+        
         stage('Push Bot App') {
             steps {
                     sh "docker push shohama/polybot:${BUILD_NUMBER}"

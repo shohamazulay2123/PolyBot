@@ -8,7 +8,7 @@ pipeline {
     environment {
         MY_GLOBAL_VARIABLE = 'some value'
         timestamp = sh(script: 'date "+%Y%m%d%H%M%S"', returnStdout: true).trim()
-        SNYK_TOKEN = credentials('SnykToken')
+       
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '3'))

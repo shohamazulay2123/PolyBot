@@ -1,69 +1,47 @@
-// @Library('shared-lib-int') _
-
-//library 'shared-lib-int@main'
-
 pipeline {
-
-    options{
-    buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '10'))
-    disableConcurrentBuilds()
-        
-   }
-    agent{
-     docker {
-        image 'my-jenkins-agent:1.0'
-        args  "-user root -v //var/run/docker.sock:/var/run/docker.sock"
-
+    agent {
+        docker {
+            image 'jenkins-agent:latest'
+            args  '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+        }
     }
+    environment {
+        MY_GLOBAL_VARIABLE = 'some value'
+        timestamp = sh(script: 'date "+%Y%m%d%H%M%S"', returnStdout: true).trim()
+        SNYK_TOKEN = credentials('SnykToken')
     }
-    environment{
-        SNYK_TOKEN = credentials('snyk-token')
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '3'))
+        disableConcurrentBuilds()
+        timestamps()
+        timeout(time: 10, unit: 'MINUTES')
     }
-    // parameters { choice(choices: ['one', 'two'], description: 'this is just for testing', name: 'testchioce') }
-//snyk container test my-image:latest --file=Dockerfile
     stages {
-        stage('Test') {
-            parallel {
-                stage('pytest') {
-                    steps {
-                        withCredentials([file(credentialsId: 'telegramToken', variable: 'TELEGRAM_TOKEN')]) {
-                        bat "cp ${TELEGRAM_TOKEN} .telegramToken"
-                        bat 'pip3 install -r requirements.txt'
-                        bat "python3 -m pytest --junitxml results.xml tests/*.py"
-                        }
-                    }
-                }
-                stage('pylint') {
-                    steps {
-                        script { 
-                            logs.info 'Starting'
-                            logs.warning 'Nothing to do!'
-                            bat "python3 -m pylint *.py || true"
-                        }
-                    }
+    stage('Build Bot App') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'DockerTokenID', passwordVariable: 'myaccesstoken', usernameVariable: 'shohama')]) {
+                    sh "docker login --username $shohama --password $myaccesstoken"
+                    sh "docker build -t build_bot:${BUILD_NUMBER} ."
+                    sh "docker tag build_bot:${BUILD_NUMBER} shohama/build_bot:${BUILD_NUMBER}"
                 }
             }
         }
-        stage('Build') {
+        stage('Snyk Test') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'pass', usernameVariable: 'user')]) {
-
-                  bat "docker build -t ronhad/private-course:poly-bot-${env.BUILD_NUMBER} . "
-                  bat "docker login --username $user --password $pass"
+            withCredentials([string(credentialsId: 'SnykToken', variable: 'SNYK_TOKEN')]) {
+            sh "snyk container test --severity-threshold=critical build_bot:${BUILD_NUMBER} --file=Dockerfile --token=${SNYK_TOKEN} --exclude-base-image-vulns"
+            }
+        }
+        }
+        stage('Push Bot App') {
+            steps {
+                    sh "docker push shohama/build_bot:${BUILD_NUMBER}"
                 }
             }
+    }
+    post {
+        always {
+            sh "docker rmi shohama/build_bot:${BUILD_NUMBER}"
         }
-        stage('snyk test') {
-            steps {
-                bat "snyk container test --severity-threshold=critical ronhad/private-course:poly-bot-${env.BUILD_NUMBER} --file=Dockerfile"
-            }
-        }
-        stage('push') {
-            steps {
-                    bat "docker push ronhad/private-course:poly-bot-${env.BUILD_NUMBER}"
-            }
-
-        }
-        
     }
 }

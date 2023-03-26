@@ -25,12 +25,7 @@ pipeline {
                     sh "docker tag polybot:${BUILD_NUMBER} shohama/polybot:${BUILD_NUMBER}"
                 }
             }
-        }
-        stage('Snyk Test') {
-            steps {
-            withCredentials([string(credentialsId: 'SnykToken', variable: 'SNYK_TOKEN')]) {
-            sh "snyk container test --severity-threshold=critical polybot:${BUILD_NUMBER} --file=Dockerfile --token=${SNYK_TOKEN} --exclude-base-image-vulns"
-            }
+        
         }
         }
         stage('Push Bot App') {

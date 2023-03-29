@@ -27,7 +27,12 @@ pipeline {
                  }
             }
         }
-      
+      stage('Snyk Test') {
+            steps {
+                withCredentials([string(credentialsId: 'SnykToken', variable: 'SNYK_TOKEN')]) {
+                    sh "snyk container test --severity-threshold=critical build_bot:${BUILD_NUMBER} --file=Dockerfile --token=${SNYK_TOKEN} --exclude-base-image-vulns"
+                }
+            }
        
         
         

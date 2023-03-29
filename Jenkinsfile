@@ -1,10 +1,6 @@
 pipeline {
-    agent {
-        docker {
-            image 'jenkins-agent:latest'
-            args  '--user root -v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any 
+    
     environment {
         MY_GLOBAL_VARIABLE = 'some value'
         timestamp = sh(script: 'date "+%Y%m%d%H%M%S"', returnStdout: true).trim()

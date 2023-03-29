@@ -21,7 +21,7 @@ pipeline {
   
     stage('Build Bot App') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'DockerTokenID', passwordVariable: 'myaccesstoken', usernameVariable: 'happytoast')]) {
+                withCredentials([usernamePassword(credentialsId: 'docker', passwordVariable: 'myaccesstoken', usernameVariable: 'happytoast')]) {
                     sh "docker login --username $happytoast --password $myaccesstoken"
                     sh "docker build -t build_bot:${BUILD_NUMBER} ."
                     sh "docker tag build_bot:${BUILD_NUMBER} happytoast/build_bot:${BUILD_NUMBER}"

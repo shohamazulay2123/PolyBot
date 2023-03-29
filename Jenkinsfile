@@ -23,8 +23,8 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker', passwordVariable: 'myaccesstoken', usernameVariable: 'happytoast')]) {
                     sh "docker login --username $happytoast --password $myaccesstoken"
-                    sh "docker build -t build_bot:${BUILD_NUMBER} ."
-                    sh "docker tag build_bot:${BUILD_NUMBER} shohama/build_bot:${BUILD_NUMBER}"
+                    sh "docker build -t my-jenkins-agent:${BUILD_NUMBER} ."
+                    sh "docker tag my-jenkins-agent:${BUILD_NUMBER} shohama/my-jenkins-agent:${BUILD_NUMBER}"
                 }
             }
         }
@@ -37,13 +37,13 @@ pipeline {
         }
         stage('Push Bot App') {
             steps {
-                sh "docker push shohama/build_bot:${BUILD_NUMBER}"
+                sh "docker push shohama/my-jenkins-agent:${BUILD_NUMBER}"
             }
         }
     }
     post {
         always {
-            sh "docker rmi shohama/polybot:${BUILD_NUMBER}"
+            sh "docker rmi shohama/my-jenkins-agent:${BUILD_NUMBER}"
         }
     }
 }

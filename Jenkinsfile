@@ -20,7 +20,7 @@ pipeline {
     stages {
     stage('Build Bot App') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'DockerTokenID', passwordVariable: 'myaccesstoken', usernameVariable: 'shohama')]) {
+                withCredentials([usernamePassword(credentialsId: 'docker', passwordVariable: 'myaccesstoken', usernameVariable: 'shohama')]) {
                     sh "docker login --username $shohama --password $myaccesstoken"
                     sh "docker build -t polybot:${BUILD_NUMBER} ."
                     sh "docker tag polybot:${BUILD_NUMBER} shohama/polybot:${BUILD_NUMBER}"

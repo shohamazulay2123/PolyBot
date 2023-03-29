@@ -1,5 +1,10 @@
 pipeline {
-    agent any 
+       agent {
+        docker {
+            image 'jenkins-agent:latest'
+            args  '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    } 
     
     environment {
         MY_GLOBAL_VARIABLE = 'some value'

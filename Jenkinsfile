@@ -1,7 +1,7 @@
 pipeline {
        agent {
         docker {
-            image 'jenkins-agent:latest'
+            image 'my-jenkins-agent:latest'
             args  '--user root -v /var/run/docker.sock:/var/run/docker.sock'
         }
     } 
@@ -30,7 +30,7 @@ pipeline {
         }
         stage('Snyk Test') {
             steps {
-                withCredentials([string(credentialsId: 'SnykToken', variable: 'SNYK_TOKEN')]) {
+                withCredentials([string(credentialsId: 'my-snyk-token', variable: 'SNYK_TOKEN')]) {
                     sh "snyk container test --severity-threshold=critical build_bot:${BUILD_NUMBER} --file=Dockerfile --token=${SNYK_TOKEN} --exclude-base-image-vulns"
                 }
             }

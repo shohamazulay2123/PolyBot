@@ -31,7 +31,7 @@ pipeline {
         stage('Snyk Test') {
             steps {
                 withCredentials([string(credentialsId: 'my-snyk-token', variable: 'SNYK_TOKEN')]) {
-                    sh "snyk container test --severity-threshold=critical build_bot:${BUILD_NUMBER} --file=Dockerfile --token=${SNYK_TOKEN} --exclude-base-image-vulns"
+                    sh "snyk container test --severity-threshold=critical my-jenkins-agent:${BUILD_NUMBER} --file=Dockerfile --token=${SNYK_TOKEN} --exclude-base-image-vulns"
                 }
             }
         }

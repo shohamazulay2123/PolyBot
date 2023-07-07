@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jenkins
+  namespace: jenkins
+spec:
+  containers:
+    - name: jenkins
+      image: jenkins/jenkins
+      ports:
+        - containerPort: 8080
+      volumeMounts:
+        - name: jenkins-data
+          mountPath: /var/jenkins
+  volumes:
+    - name: jenkins-data
+      emptyDir: {}

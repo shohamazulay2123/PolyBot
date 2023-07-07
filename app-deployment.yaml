@@ -1,4 +1,4 @@
-#app-deployment.yaml
+# app-deployment.yaml
 
 apiVersion: apps/v1
 kind: Deployment
@@ -16,7 +16,9 @@ spec:
     spec:
       containers:
       - name: my-app
-        image: my-app
-        imagePullPolicy: Never
+        image: shohama/build_bot:latest
+        imagePullPolicy: IfNotPresent
         stdin: true
         tty: true
+      imagePullSecrets:
+      - name: regcred

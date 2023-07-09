@@ -1,5 +1,4 @@
 @Library("devops22-sharedlib") _
-
 pipeline {
     agent {
         kubernetes {
@@ -32,7 +31,7 @@ pipeline {
     }
     environment {
         MY_GLOBAL_VARIABLE = 'some value'
-        timestamp = sh(script: 'date "+%Y%m%d%H%M%S"', returnStdout: true).trim()
+       timestamp = sh(script: 'date "+%Y%m%d%H%M%S"', returnStdout: true).trim()
         SNYK_TOKEN = credentials('SnykToken')
         TELEGRAM_TOKEN = credentials('telegramToken')
     }

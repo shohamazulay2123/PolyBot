@@ -13,7 +13,7 @@ pipeline {
                   serviceAccountName: jenkins
                   containers:
                   - name: jenkins-agent
-                    image: shohama/jenkinsdockeragent:latest
+                    image: shohama/my-jenkins-agent:latest
                     imagePullPolicy: Always
                     volumeMounts:
                      - name: jenkinsagent-pvc

@@ -1,4 +1,5 @@
 @Library("devops22-sharedlib") _
+
 pipeline {
     agent {
         kubernetes {
@@ -13,7 +14,7 @@ pipeline {
                   serviceAccountName: jenkins
                   containers:
                   - name: jenkins-agent
-                    image: shohama/my-jenkins-agent
+                    image: shohama\my-jenkins-agent
                     imagePullPolicy: Always
                     volumeMounts:
                      - name: jenkinsagent-pvc
@@ -31,7 +32,7 @@ pipeline {
     }
     environment {
         MY_GLOBAL_VARIABLE = 'some value'
-       timestamp = sh(script: 'date "+%Y%m%d%H%M%S"', returnStdout: true).trim()
+        timestamp = sh(script: 'date "+%Y%m%d%H%M%S"', returnStdout: true).trim()
         SNYK_TOKEN = credentials('SnykToken')
         TELEGRAM_TOKEN = credentials('telegramToken')
     }
@@ -67,10 +68,10 @@ pipeline {
         }
         stage('Build Bot App') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'DockerTokenID', passwordVariable: 'myaccesstoken', usernameVariable: 'happytoast')]) {
+                withCredentials([usernamePassword(credentialsId: 'DockerTokenID', passwordVariable: 'myaccesstoken', usernameVariable: 'shohama')]) {
                     sh "docker login --username $shohama --password $myaccesstoken"
                     sh "docker build -t build_bot:${BUILD_NUMBER} ."
-                    sh "docker tag build_bot:${BUILD_NUMBER} happytoast/build_bot:${BUILD_NUMBER}"
+                    sh "docker tag build_bot:${BUILD_NUMBER} shohama/build_bot:${BUILD_NUMBER}"
                 }
             }
         }
@@ -83,7 +84,7 @@ pipeline {
         }
         stage('Push Bot App') {
             steps {
-                sh "docker push Shohama/build_bot:${BUILD_NUMBER}"
+                sh "docker push shohama/build_bot:${BUILD_NUMBER}"
             }
         }
     }

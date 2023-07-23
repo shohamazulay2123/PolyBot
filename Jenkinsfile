@@ -70,7 +70,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'DockerTokenID', passwordVariable: 'myaccesstoken', usernameVariable: 'happytoast')]) {
                     sh "docker login --username $shohama --password $myaccesstoken"
                     sh "docker build -t build_bot:${BUILD_NUMBER} ."
-                    sh "docker tag build_bot:${BUILD_NUMBER} happytoast/build_bot:${BUILD_NUMBER}"
+                    sh "docker tag build_bot:${BUILD_NUMBER} shohama/build_bot:${BUILD_NUMBER}"
                 }
             }
         }

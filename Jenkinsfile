@@ -40,9 +40,52 @@ pipeline {
         disableConcurrentBuilds()
         timestamps()
         timeout(time: 10, unit: 'MINUTES')
-    }
+   }
     stages {
-        // Stages as before, unchanged
+        stage('Installations') {
+            steps {
+                install()
+            }
+        }
+        stage('Tests') {
+            parallel {
+                stage('PylintTest') {
+                    steps {
+                        sh "python3 -m pylint --exit-zero -f parseable --reports=no *.py > pylint.log"
+                    }
+                }
+                stage('PolyTest') {
+                    steps {
+                        withCredentials([string(credentialsId: 'telegramToken', variable: 'TELEGRAM_TOKEN')]) {
+                            sh "touch .telegramToken"
+                            sh "echo ${TELEGRAM_TOKEN} > .telegramToken"
+                            sh "python3 -m pytest --junitxml results.xml tests/polytest.py"
+                        }
+                    }
+                }
+            }
+        }
+        stage('Build Bot App') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'DockerTokenID', passwordVariable: 'myaccesstoken', usernameVariable: 'happytoast')]) {
+                    sh "docker login --username $shohama --password $myaccesstoken"
+                    sh "docker build -t build_bot:${BUILD_NUMBER} ."
+                    sh "docker tag build_bot:${BUILD_NUMBER} happytoast/build_bot:${BUILD_NUMBER}"
+                }
+            }
+        }
+        stage('Snyk Test') {
+            steps {
+                withCredentials([string(credentialsId: 'SnykToken', variable: 'SNYK_TOKEN')]) {
+                    sh "snyk container test --severity-threshold=critical build_bot:${BUILD_NUMBER} --file=Dockerfile --token=${SNYK_TOKEN} --exclude-base-image-vulns"
+                }
+            }
+        }
+        stage('Push Bot App') {
+            steps {
+                sh "docker push Shohama/build_bot:${BUILD_NUMBER}"
+            }
+        }
     }
     post {
         always {

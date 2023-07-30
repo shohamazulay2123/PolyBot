@@ -54,12 +54,12 @@ pipeline {
                         sh "python3 -m pylint --exit-zero -f parseable --reports=no *.py > pylint.log"
                     }
                 }
-                stage('PolyTest') {
+               stage('pytest') {
                     steps {
-                        withCredentials([string(credentialsId: 'telegramToken', variable: 'TELEGRAM_TOKEN')]) {
-                            sh "touch .telegramToken"
-                            sh "echo ${TELEGRAM_TOKEN} > .telegramToken"
-                            sh "python3 -m pytest --junitxml results.xml tests/polytest.py"
+                        withCredentials([file(credentialsId: 'telegramToken', variable: 'TELEGRAM_TOKEN')]) {
+                        sh "cp ${TELEGRAM_TOKEN} .telegramToken"
+                        sh 'pip3 install -r requirements.txt'
+                        sh "python3 -m pytest --junitxml results.xml tests/*.py"
                         }
                     }
                 }
